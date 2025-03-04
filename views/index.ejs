@@ -8,6 +8,9 @@
         <h1>Welcome back, <%= user.username %></h1>
         <a href="/log-out">LOG OUT</a>
         <a href="/new">New Message</a>
+        <% if (!locals.user.is_member) { %>
+            <a href="/secret-code">Secret Code</a>
+        <% } %>
     <% } else { %>
         <h1>Members Only Messages</h1>
         <a href="/sign-up">Sign Up</a>

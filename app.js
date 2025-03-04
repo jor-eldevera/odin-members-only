@@ -6,6 +6,7 @@ const session = require("express-session");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const bcrypt = require("bcryptjs");
+const querystring = require('querystring');
 
 const pool = new Pool({
     host: process.env.PG_HOST,
@@ -14,6 +15,8 @@ const pool = new Pool({
     password: process.env.PG_PASSWORD,
     port: process.env.PG_PORT
 });
+
+const SECRET_CODE = "vanillatwinkie"
 
 const app = express();
 app.set("views", path.join(__dirname, "views"));
@@ -29,15 +32,13 @@ app.use((req, res, next) => {
     next();
 });
 
+// Home page route
 app.get("/", async (req, res) => {
     const { rows } = await pool.query("SELECT messages.*, users.first_name, users.last_name, users.username FROM messages JOIN users ON messages.user_id = users.id ORDER BY messages.created_at DESC;");
     res.render("index", { user: req.user, messages: rows });
 });
-app.get("/log-in", (req, res) => {
-    const messages = req.session.messages || [];
-    req.session.messages = [];
-    res.render("log-in-form", { message: messages[messages.length - 1] });
-});
+
+// Sign up routes
 app.get("/sign-up", (req, res) => res.render("sign-up-form"));
 app.post("/sign-up", async (req, res, next) => {
     try {
@@ -50,6 +51,13 @@ app.post("/sign-up", async (req, res, next) => {
         return next(err)
     }
 });
+
+// Log in routes
+app.get("/log-in", (req, res) => {
+    const messages = req.session.messages || [];
+    req.session.messages = [];
+    res.render("log-in-form", { message: messages[messages.length - 1] });
+});
 app.post("/log-in",
     passport.authenticate("local", {
         successRedirect: "/",
@@ -57,6 +65,8 @@ app.post("/log-in",
         failureMessage: true
     })
 );
+
+// Log out routes
 app.get("/log-out", (req, res, next) => {
     req.logout((err) => {
         if (err) {
@@ -64,6 +74,20 @@ app.get("/log-out", (req, res, next) => {
         }
         res.redirect("/");
     })
+});
+
+// Secret code routes
+app.get("/secret-code", (req, res) => res.render("secret-code-form", { valid: req.query.valid }));
+app.post("/secret-code", async (req, res) => {
+    const { code } = req.body;
+    if (code === SECRET_CODE) {
+        const { id } = req.user;
+        await pool.query("UPDATE users SET is_member = TRUE WHERE id = $1", [id]);
+        res.redirect("/");
+    } else {
+        const query = querystring.stringify({ valid: "false" });
+        res.redirect(`/secret-code?${query}`);
+    }
 });
 
 // Add this middleware function to check if user is authenticated
