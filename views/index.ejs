@@ -20,13 +20,15 @@
     <% messages.forEach(message => { %>
         <div class="message">
             <p class="message-text"><%= message.message %></p>
-            <p class="message-author">by <%= message.username %></p>
-            <p class="message-date"><%= new Date(message.created_at).toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit' })%></p>
+            <% if (locals.user && locals.user.is_member) { %>
+                <p class="message-author">by <%= message.username %></p>
+                <p class="message-date"><%= new Date(message.created_at).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit' })%></p>
+            <% } %>
         </div>
     <% }) %>
 </body>
