@@ -16,7 +16,8 @@ const pool = new Pool({
     port: process.env.PG_PORT
 });
 
-const SECRET_CODE = "vanillatwinkie"
+const SECRET_CODE = "vanillatwinkie";
+const ADMIN_CODE = "lemonsherbert";
 
 const app = express();
 app.set("views", path.join(__dirname, "views"));
@@ -88,6 +89,27 @@ app.post("/secret-code", async (req, res) => {
         const query = querystring.stringify({ valid: "false" });
         res.redirect(`/secret-code?${query}`);
     }
+});
+
+// Admin code routes
+app.get("/admin-code", (req, res) => res.render("admin-code-form", { valid: req.query.valid }));
+app.post("/admin-code", async (req, res) => {
+    const { code } = req.body;
+    if (code === ADMIN_CODE) {
+        const { id } = req.user;
+        await pool.query("UPDATE users SET is_admin = TRUE WHERE id = $1", [id]);
+        res.redirect("/");
+    } else {
+        const query = querystring.stringify({ valid: "false" });
+        res.redirect(`/admin-code?${query}`);
+    }
+});
+
+// Delete message routes
+app.get("/delete-message/:id", async (req, res) => {
+    const { id } = req.params;
+    await pool.query("DELETE FROM messages WHERE message_id = $1", [id]);
+    res.redirect("/");
 });
 
 // Add this middleware function to check if user is authenticated

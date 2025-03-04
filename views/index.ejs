@@ -28,6 +28,9 @@
                     day: 'numeric',
                     hour: '2-digit',
                     minute: '2-digit' })%></p>
+                <% if (locals.user && locals.user.is_admin) { %>
+                    <a href="/delete-message/<%= message.message_id %>">Delete Message</a>
+                <% } %>
             <% } %>
         </div>
     <% }) %>

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>Members Only | Admin Code</title>
+</head>
+<body>
+    <% if (locals.valid === "false") { %>
+        <p>Incorrect code</p>
+    <% } %>
+    <form action="/admin-code" method="POST">
+        <label id="admin-code-label" for="code">What is the admin code?</label>
+        <input type="text" name="code" id="code">
+        <button type="submit">Submit</button>
+    </form>
+</body>
