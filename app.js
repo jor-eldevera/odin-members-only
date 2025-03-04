@@ -23,8 +23,15 @@ app.use(session({ secret: "cats", resave: false, saveUninitialized: false }));
 app.use(passport.session());
 app.use(express.urlencoded({ extended: false }));
 
-app.get("/", (req, res) => {
-    res.render("index", { user: req.user });
+// makes the currentUser variable available in all of the views
+app.use((req, res, next) => {
+    res.locals.currentUser = req.user;
+    next();
+});
+
+app.get("/", async (req, res) => {
+    const { rows } = await pool.query("SELECT * FROM messages");
+    res.render("index", { user: req.user, messages: rows });
 });
 app.get("/log-in", (req, res) => {
     const messages = req.session.messages || [];
@@ -43,8 +50,7 @@ app.post("/sign-up", async (req, res, next) => {
         return next(err)
     }
 });
-app.post(
-    "/log-in",
+app.post("/log-in",
     passport.authenticate("local", {
         successRedirect: "/",
         failureRedirect: "/log-in",
@@ -60,12 +66,22 @@ app.get("/log-out", (req, res, next) => {
     })
 });
 
-// makes the currentUser variable available in all of the views
-app.use((req, res, next) => {
-    res.locals.currentUser = req.user;
-    next();
-});
+// Add this middleware function to check if user is authenticated
+const isAuth = (req, res, next) => {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect("/log-in");
+};
 
+// Protect both the GET and POST /new routes
+app.get("/new", isAuth, (req, res) => res.render("new-message-form"));
+app.post("/new", isAuth, async (req, res) => {
+    const { message } = req.body;
+    const { id } = req.user;
+    await pool.query("INSERT INTO messages (message, user_id) VALUES ($1, $2)", [message, id]);
+    res.redirect("/");
+});
 
 passport.use(
     new LocalStrategy(async (username, password, done) => {
