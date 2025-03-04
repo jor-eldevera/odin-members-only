@@ -30,7 +30,7 @@ app.use((req, res, next) => {
 });
 
 app.get("/", async (req, res) => {
-    const { rows } = await pool.query("SELECT * FROM messages");
+    const { rows } = await pool.query("SELECT messages.*, users.first_name, users.last_name, users.username FROM messages JOIN users ON messages.user_id = users.id ORDER BY messages.created_at DESC;");
     res.render("index", { user: req.user, messages: rows });
 });
 app.get("/log-in", (req, res) => {
