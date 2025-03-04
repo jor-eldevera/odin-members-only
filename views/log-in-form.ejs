@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>Members Only | Log In</title>
+</head>
+<body>
+    <h1>Log In</h1>
+    <% if (message) { %>
+        <p id="error-message"><%= message %></p>
+    <% } %>
+    <form action="/log-in" method="POST">
+        <label for="username">Username</label>
+        <input type="text" name="username" id="username">
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password">
+        <button type="submit">Log In</button>
+    </form>
+</body>
+<style>
+    #error-message {
+        color: red;
+    }
+</style>
