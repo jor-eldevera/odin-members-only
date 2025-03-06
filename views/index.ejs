@@ -19,7 +19,7 @@
     <% } %>
     <h2>Messages</h2>
     <% messages.forEach(message => { %>
-        <div class="message">
+        <div class="message container">
             <p class="message-text"><%= message.message %></p>
             <% if (locals.user && locals.user.is_member) { %>
                 <p class="message-author">by <%= message.username %></p>

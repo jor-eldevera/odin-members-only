@@ -5,12 +5,14 @@
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-    <% if (locals.valid === "false") { %>
-        <p>Incorrect code</p>
-    <% } %>
-    <form action="/admin-code" method="POST">
-        <label id="admin-code-label" for="code">What is the admin code?</label>
-        <input type="text" name="code" id="code">
-        <button type="submit">Submit</button>
-    </form>
+    <div class="container">
+        <% if (locals.valid === "false") { %>
+            <p>Incorrect code</p>
+        <% } %>
+        <form action="/admin-code" method="POST">
+            <label id="admin-code-label" for="code">What is the admin code?</label>
+            <input type="text" name="code" id="code">
+            <button type="submit">Submit</button>
+        </form>
+    </div>
 </body>
