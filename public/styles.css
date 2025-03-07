@@ -37,6 +37,39 @@ button:hover {
     background-color: #0056b3;
 }
 
+.messages-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    height: 100vh;
+    max-height: 100vh;
+    overflow-x: auto;
+}
+
+.message {
+    width: 300px;
+    margin-bottom: 10px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.message-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+}
+
+.delete-message {
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+
 #error-message {
     color: red;
 }
