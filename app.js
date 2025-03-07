@@ -3,6 +3,7 @@ const path = require("node:path");
 const { Pool } = require("pg");
 const express = require("express");
 const session = require("express-session");
+const { body, validationResult } = require('express-validator');
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const bcrypt = require("bcryptjs");
@@ -43,11 +44,33 @@ app.get("/", async (req, res) => {
 
 // Sign up routes
 app.get("/sign-up", (req, res) => res.render("sign-up-form"));
-app.post("/sign-up", async (req, res, next) => {
+app.post("/sign-up", [
+    // Validate password length
+    body('password')
+        .isLength({ min: 5 })
+        .withMessage('Password must be at least 5 characters long'),
+    // Validate password confirmation
+    body('passwordConfirmation')
+        .custom((value, { req }) => {
+            if (value !== req.body.password) {
+                throw new Error('Passwords do not match');
+            }
+            return true;
+        }),
+], async (req, res, next) => {
     try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.render('sign-up-form', { 
+                errors: errors.array(),
+                user: req.body // Pass back the user input
+            });
+        }
+
         const { username, password, first_name, last_name } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
-        await pool.query("INSERT INTO users (username, password, first_name, last_name) VALUES ($1, $2, $3, $4)", [username, hashedPassword, first_name, last_name]);
+        await pool.query("INSERT INTO users (username, password, first_name, last_name) VALUES ($1, $2, $3, $4)", 
+            [username, hashedPassword, first_name, last_name]);
         res.redirect("/");
     } catch (err) {
         console.error(err);

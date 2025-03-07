@@ -6,15 +6,24 @@
 </head>
 <body>
     <h1>Sign Up</h1>
+    <% if (locals.errors) { %>
+        <ul class="errors">
+            <% errors.forEach(error => { %>
+                <li><%= error.msg %></li>
+            <% }) %>
+        </ul>
+    <% } %>
     <form action="/sign-up" method="POST">
         <label for="username">Username</label>
-        <input type="text" name="username" id="username">
+        <input type="text" name="username" id="username" value="<%= locals.user ? user.username : '' %>">
         <label for="password">Password</label>
         <input type="password" name="password" id="password">
+        <label for="passwordConfirmation">Confirm Password</label>
+        <input type="password" name="passwordConfirmation" id="passwordConfirmation">
         <label for="first_name">First Name</label>
-        <input type="text" name="first_name" id="first_name">
+        <input type="text" name="first_name" id="first_name" value="<%= locals.user ? user.first_name : '' %>">
         <label for="last_name">Last Name</label>
-        <input type="text" name="last_name" id="last_name">
+        <input type="text" name="last_name" id="last_name" value="<%= locals.user ? user.last_name : '' %>">
         <button type="submit">Sign Up</button>
     </form>
 </body>
